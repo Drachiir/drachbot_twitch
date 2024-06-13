@@ -7,9 +7,9 @@ with open("Files/json/Secrets.json", "r") as f:
     secret = json.load(f)
     f.close()
 
-streamer_dict = {
-    "drachiir": "Drachir"
-}
+with open("Files/json/streamers.json", "r") as f:
+    streamer_dict = json.load(f)
+    f.close()
 
 class Bot(commands.Bot):
 
