@@ -77,8 +77,11 @@ class Bot(commands.Bot):
             start_string = f"is Rank {rank},"
         else:
             start_string = "is"
-        
-        await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo")
+        if playername.casefold() == "fine":
+            end_string = " 🍆"
+        else:
+            end_string = ""
+        await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo{end_string}")
     
     @commands.command()
     async def rank(self, ctx: commands.Context):
