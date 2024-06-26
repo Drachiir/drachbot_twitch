@@ -77,10 +77,13 @@ class Bot(commands.Bot):
             start_string = f"is Rank {rank},"
         else:
             start_string = "is"
-        if playername.casefold() == "fine":
-            end_string = " 🍆"
-        else:
-            end_string = ""
+        match playername.casefold():
+            case "fine":
+                end_string = " 🍆"
+            case "pennywise":
+                end_string = "🤡"
+            case _:
+                end_string = ""
         await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo{end_string}")
     
     @commands.command()
