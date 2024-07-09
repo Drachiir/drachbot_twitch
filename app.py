@@ -3,6 +3,30 @@ import asyncio
 import aiohttp
 from twitchio.ext import commands
 
+recc_values = [
+    150,
+    150,
+    215,
+    270,
+    335,
+    445,
+    570,
+    700,
+    820,
+    1075,
+    1300,
+    1560,
+    1820,
+    2200,
+    2770,
+    3350,
+    3930,
+    4700,
+    5900,
+    7100,
+    8500
+]
+
 with open("Files/json/Secrets.json", "r") as f:
     secret = json.load(f)
     f.close()
@@ -109,6 +133,20 @@ class Bot(commands.Bot):
                 return
         
         await ctx.reply(f"{stats["profile"][0]["playerName"]} is Rank {rank}, {stats["overallElo"]} Elo")
+    
+    @commands.command()
+    async def info(self, ctx: commands.Context):
+        wave = ctx.message.content[6:]
+        try:
+            if wave[-1].encode("unicode_escape") == b'\\U000e0000':
+                wave = wave[:-2]
+            wave = int(wave)
+            if 1 > wave > 21:
+                await ctx.reply("Need a number 1-21")
+        except Exception:
+            await ctx.reply("Need a number 1-21")
+            return
+        await ctx.reply(f"Wave {wave} recc. value is {recc_values[wave-1]}")
 
 if __name__ == "__main__":
     bot = Bot()
