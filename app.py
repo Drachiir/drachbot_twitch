@@ -48,9 +48,6 @@ class Bot(commands.Bot):
     async def event_message(self, message):
         if message.echo:
             return
-        
-        print(message.author.name ,message.content)
-        
         await self.handle_commands(message)
 
     @commands.command()
