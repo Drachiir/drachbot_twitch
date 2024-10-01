@@ -27,6 +27,12 @@ recc_values = [
     8500
 ]
 
+def check_command_enabled(command_list, command):
+    if ("all" in command_list) or (command in command_list):
+        return True
+    else:
+        return False
+    
 with open("Files/json/Secrets.json", "r") as f:
     secret = json.load(f)
     f.close()
@@ -52,6 +58,8 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def elo(self, ctx: commands.Context):
+        if not check_command_enabled(streamer_dict[ctx.channel.name][1], "elo"):
+            return
         playername: str = ctx.message.content[5:]
         try:
             if playername[-1].encode("unicode_escape") == b'\\U000e0000':
@@ -59,7 +67,7 @@ class Bot(commands.Bot):
         except IndexError:
             pass
         if playername == "":
-            playername = streamer_dict[ctx.channel.name]
+            playername = streamer_dict[ctx.channel.name][0]
         #check if player in top X
         url = f'https://apiv2.legiontd2.com/players/stats?limit={200}&sortBy=overallElo&sortDirection=-1'
         async with self.session.get(url) as response:
@@ -105,10 +113,15 @@ class Bot(commands.Bot):
                 end_string = "🤡"
             case _:
                 end_string = ""
-        await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo{end_string}")
+        try:
+            await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo{end_string}")
+        except Exception:
+            await ctx.reply(f"No data available for {playername}")
     
     @commands.command()
     async def rank(self, ctx: commands.Context):
+        if not check_command_enabled(streamer_dict[ctx.channel.name][1], "rank"):
+            return
         rank = ctx.message.content[6:]
         try:
             if rank[-1].encode("unicode_escape") == b'\\U000e0000':
@@ -133,6 +146,8 @@ class Bot(commands.Bot):
     
     @commands.command()
     async def info(self, ctx: commands.Context):
+        if not check_command_enabled(streamer_dict[ctx.channel.name][1], "info"):
+            return
         wave = ctx.message.content[6:]
         try:
             if wave[-1].encode("unicode_escape") == b'\\U000e0000':
