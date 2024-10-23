@@ -163,14 +163,14 @@ class Bot(commands.Bot):
                 await ctx.reply(f"Bot error 😭")
                 return
             try:
-                game = json.loads(await response.text())[0]
+                game = json.loads(await response.text())
             except IndexError:
                 await ctx.reply(f"Bot error 😭")
                 return
         if not game:
-            await ctx.reply(f"{streamer_dict[ctx.channel.name][0]} is not in game currently.")
-        await ctx.reply(", ".join([f"{player[0]}: {player[1]}" for player in game[2]])
-)
+            await ctx.reply(f"{name} is not in game currently.")
+            return
+        await ctx.reply((", ".join([f"{player[0]}: {player[1]}" for player in game[2]]) + " vs. " + (", ".join([f"{player[0]}: {player[1]}" for player in game[3]]))))
     
     @commands.command()
     async def info(self, ctx: commands.Context):
