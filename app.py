@@ -145,6 +145,34 @@ class Bot(commands.Bot):
         await ctx.reply(f"{stats["profile"][0]["playerName"]} is Rank {rank}, {stats["overallElo"]} Elo")
     
     @commands.command()
+    async def lobby(self, ctx: commands.Context):
+        if not check_command_enabled(streamer_dict[ctx.channel.name][1], "lobby"):
+            return
+        name = ctx.message.content[7:]
+        try:
+            if name[-1].encode("unicode_escape") == b'\\U000e0000':
+                name = name[:-2]
+        except IndexError:
+            pass
+        if not name:
+            name = streamer_dict[ctx.channel.name][0]
+        url = f'https://stats.drachbot.site/api/livegames/{name}'
+        async with self.session.get(url) as response:
+            if response.status != 200:
+                print(response.status)
+                await ctx.reply(f"Bot error 😭")
+                return
+            try:
+                game = json.loads(await response.text())[0]
+            except IndexError:
+                await ctx.reply(f"Bot error 😭")
+                return
+        if not game:
+            await ctx.reply(f"{streamer_dict[ctx.channel.name][0]} is not in game currently.")
+        await ctx.reply(", ".join([f"{player[0]}: {player[1]}" for player in game[2]])
+)
+    
+    @commands.command()
     async def info(self, ctx: commands.Context):
         if not check_command_enabled(streamer_dict[ctx.channel.name][1], "info"):
             return
