@@ -130,6 +130,11 @@ class Bot(commands.Bot):
         except Exception:
             await ctx.reply("Need a number e.g !rank 1")
             return
+        if rank-1 < 1:
+            if "shadowings" in ctx.author.display_name:
+                await ctx.reply(f"Bad shadow Madge")
+            else:
+                await ctx.reply(f"Need a number greater than 0")
         url = f'https://apiv2.legiontd2.com/players/stats?limit={1}&offset={rank-1}&sortBy=overallElo&sortDirection=-1'
         async with self.session.get(url) as response:
             if response.status != 200:
