@@ -72,7 +72,6 @@ class Bot(commands.Bot):
         url = f'https://apiv2.legiontd2.com/players/stats?limit={200}&sortBy=overallElo&sortDirection=-1'
         async with self.session.get(url) as response:
             if response.status != 200:
-                print(response.status)
                 await ctx.reply(f"Bot error 😭")
                 return
             leaderboard = json.loads(await response.text())
@@ -88,7 +87,6 @@ class Bot(commands.Bot):
             url = 'https://apiv2.legiontd2.com/' + request_type + playername
             async with self.session.get(url) as response:
                 if response.status != 200:
-                    print(response.status)
                     await ctx.reply(f"{playername} not found")
                     return
                 playerprofile = json.loads(await response.text())
@@ -97,7 +95,6 @@ class Bot(commands.Bot):
             url = 'https://apiv2.legiontd2.com/' + request_type + playerprofile["_id"]
             async with self.session.get(url) as response:
                 if response.status != 200:
-                    print(response.status)
                     await ctx.reply(f"Bot error 😭")
                     return
                 rank = None
@@ -139,7 +136,6 @@ class Bot(commands.Bot):
         url = f'https://apiv2.legiontd2.com/players/stats?limit={1}&offset={rank-1}&sortBy=overallElo&sortDirection=-1'
         async with self.session.get(url) as response:
             if response.status != 200:
-                print(response.status)
                 await ctx.reply(f"Bot error 😭")
                 return
             try:
