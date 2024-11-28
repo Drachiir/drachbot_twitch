@@ -127,7 +127,7 @@ class Bot(commands.Bot):
         except Exception:
             await ctx.reply("Need a number e.g !rank 1")
             return
-        if rank-1 < 1:
+        if rank < 1:
             if "shadowings" in ctx.author.display_name:
                 await ctx.reply(f"Bad shadow Madge")
             else:
