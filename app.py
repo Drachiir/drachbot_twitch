@@ -208,13 +208,21 @@ class Bot(commands.Bot):
             await ctx.reply(f"Could not find your name in the game.")
             return
         
-        you, teammate, opponent, other = None, None, None, None
-        if name in [team_one[0][0].lower(), team_one[1][0].lower()]:
-            you, teammate = players[name], players[team_one[1][0].lower()] if name == team_one[0][0].lower() else players[team_one[0][0].lower()]
+        if name == team_one[0][0].lower():  # P1
+            you, teammate = players[name], players[team_one[1][0].lower()]
             opponent, other = players[team_two[0][0].lower()], players[team_two[1][0].lower()]
-        else:
-            you, teammate = players[name], players[team_two[1][0].lower()] if name == team_two[0][0].lower() else players[team_two[0][0].lower()]
+        elif name == team_one[1][0].lower():  # P2
+            you, teammate = players[name], players[team_one[0][0].lower()]
+            opponent, other = players[team_two[1][0].lower()], players[team_two[0][0].lower()]
+        elif name == team_two[0][0].lower():  # P3
+            you, teammate = players[name], players[team_two[1][0].lower()]
             opponent, other = players[team_one[1][0].lower()], players[team_one[0][0].lower()]
+        elif name == team_two[1][0].lower():  # P4
+            you, teammate = players[name], players[team_two[0][0].lower()]
+            opponent, other = players[team_one[0][0].lower()], players[team_one[1][0].lower()]
+        else:
+            await ctx.reply(f"Could not find your name in the game.")
+            return
         
         sellout_score = you[0] + other[0] - teammate[0] - opponent[0]
         recommendation = f"You should sell out {teammate[1]}. JULES" if sellout_score > 0 else f"You shouldn't sell out {teammate[1]}. JULES"
