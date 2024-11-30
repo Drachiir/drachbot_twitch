@@ -28,7 +28,7 @@ recc_values = [
 ]
 
 def check_command_enabled(command_list, command):
-    if ("all" in command_list) or (command in command_list):
+    if command not in command_list:
         return True
     else:
         return False
@@ -173,6 +173,71 @@ class Bot(commands.Bot):
             await ctx.reply(f"{name} is not in game currently.")
             return
         await ctx.reply((", ".join([f"{player[0]}: {player[1]}" for player in game[2]]) + " vs. " + (", ".join([f"{player[0]}: {player[1]}" for player in game[3]]))))
+    
+    @commands.command()
+    async def sellout(self, ctx: commands.Context):
+        if not check_command_enabled(streamer_dict[ctx.channel.name][1], "sellout"):
+            return
+        name = ctx.message.content[9:]
+        try:
+            if name[-1].encode("unicode_escape") == b'\\U000e0000':
+                name = name[:-2]
+        except IndexError:
+            pass
+        if not name:
+            name = streamer_dict[ctx.channel.name][0]
+        url = f'https://stats.drachbot.site/api/livegames/{name}'
+        async with self.session.get(url) as response:
+            if response.status != 200:
+                print(response.status)
+                await ctx.reply(f"Bot error 😭")
+                return
+            try:
+                game = json.loads(await response.text())
+            except IndexError:
+                await ctx.reply(f"Bot error 😭")
+                return
+        if not game:
+            await ctx.reply(f"{name} is not in game currently.")
+            return
+        team_one = game[2]
+        team_two = game[3]
+        you = None
+        teammate = None
+        opponent = None
+        other = None
+
+        if team_one[0][0] == name:  # P1
+            you = int(team_one[0][1])
+            teammate = int(team_one[1][1])  # P2
+            opponent = int(team_two[0][1])  # P3 (sending target)
+            other = int(team_two[1][1])  # P4
+        elif team_one[1][0] == name:  # P2
+            you = int(team_one[1][1])
+            teammate = int(team_one[0][1])  # P1
+            opponent = int(team_two[1][1])  # P4 (sending target)
+            other = int(team_two[0][1])  # P3
+        elif team_two[0][0] == name:  # P3
+            you = int(team_two[0][1])
+            teammate = int(team_two[1][1])  # P4
+            opponent = int(team_one[1][1])  # P2 (sending target)
+            other = int(team_one[0][1])  # P1
+        elif team_two[1][0] == name:  # P4
+            you = int(team_two[1][1])
+            teammate = int(team_two[0][1])  # P3
+            opponent = int(team_one[0][1])  # P1 (sending target)
+            other = int(team_one[1][1])  # P2
+        else:
+            await ctx.reply(f"Could not find your name in the game.")
+            return
+        
+        sellout_score = you + other - teammate - opponent
+        if sellout_score > 0:
+            recommendation = "You should sell out your teammate."
+        else:
+            recommendation = "You should not sell out your teammate."
+        
+        await ctx.reply(f"Sellout Score for {name}: {sellout_score}. {recommendation}")
     
     @commands.command()
     async def info(self, ctx: commands.Context):
