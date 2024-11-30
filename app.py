@@ -189,55 +189,37 @@ class Bot(commands.Bot):
         url = f'https://stats.drachbot.site/api/livegames/{name}'
         async with self.session.get(url) as response:
             if response.status != 200:
-                print(response.status)
                 await ctx.reply(f"Bot error 😭")
                 return
             try:
                 game = json.loads(await response.text())
-            except IndexError:
+            except Exception:
                 await ctx.reply(f"Bot error 😭")
                 return
+        
         if not game:
             await ctx.reply(f"{name} is not in game currently.")
             return
-        team_one = game[2]
-        team_two = game[3]
-        you = None
-        teammate = None
-        opponent = None
-        other = None
-
-        if team_one[0][0] == name:  # P1
-            you = int(team_one[0][1])
-            teammate = int(team_one[1][1])  # P2
-            opponent = int(team_two[0][1])  # P3 (sending target)
-            other = int(team_two[1][1])  # P4
-        elif team_one[1][0] == name:  # P2
-            you = int(team_one[1][1])
-            teammate = int(team_one[0][1])  # P1
-            opponent = int(team_two[1][1])  # P4 (sending target)
-            other = int(team_two[0][1])  # P3
-        elif team_two[0][0] == name:  # P3
-            you = int(team_two[0][1])
-            teammate = int(team_two[1][1])  # P4
-            opponent = int(team_one[1][1])  # P2 (sending target)
-            other = int(team_one[0][1])  # P1
-        elif team_two[1][0] == name:  # P4
-            you = int(team_two[1][1])
-            teammate = int(team_two[0][1])  # P3
-            opponent = int(team_one[0][1])  # P1 (sending target)
-            other = int(team_one[1][1])  # P2
-        else:
+        
+        team_one, team_two = game[2], game[3]
+        players = {p[0].lower(): (int(p[1]), p[0]) for p in team_one + team_two}
+        
+        if name not in players:
             await ctx.reply(f"Could not find your name in the game.")
             return
         
-        sellout_score = you + other - teammate - opponent
-        if sellout_score > 0:
-            recommendation = "You should sell out your teammate."
+        you, teammate, opponent, other = None, None, None, None
+        if name in [team_one[0][0].lower(), team_one[1][0].lower()]:
+            you, teammate = players[name], players[team_one[1][0].lower()] if name == team_one[0][0].lower() else players[team_one[0][0].lower()]
+            opponent, other = players[team_two[0][0].lower()], players[team_two[1][0].lower()]
         else:
-            recommendation = "You should not sell out your teammate."
+            you, teammate = players[name], players[team_two[1][0].lower()] if name == team_two[0][0].lower() else players[team_two[0][0].lower()]
+            opponent, other = players[team_one[1][0].lower()], players[team_one[0][0].lower()]
         
-        await ctx.reply(f"Sellout Score for {name}: {sellout_score}. {recommendation}")
+        sellout_score = you[0] + other[0] - teammate[0] - opponent[0]
+        recommendation = f"You should sell out {teammate[1]}." if sellout_score > 0 else f"You shouldn't sell out {teammate[1]}."
+        
+        await ctx.reply(f"{you[1]} Sellout Score: {sellout_score}. {recommendation}")
     
     @commands.command()
     async def info(self, ctx: commands.Context):
