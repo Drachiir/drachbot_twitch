@@ -178,7 +178,7 @@ class Bot(commands.Bot):
     async def sellout(self, ctx: commands.Context):
         if not check_command_enabled(streamer_dict[ctx.channel.name][1], "sellout"):
             return
-        name = ctx.message.content[9:]
+        name = ctx.message.content[9:].lower()
         try:
             if name[-1].encode("unicode_escape") == b'\\U000e0000':
                 name = name[:-2]
@@ -203,7 +203,6 @@ class Bot(commands.Bot):
         
         team_one, team_two = game[2], game[3]
         players = {p[0].lower(): (int(p[1]), p[0]) for p in team_one + team_two}
-        
         if name not in players:
             await ctx.reply(f"Could not find your name in the game.")
             return
