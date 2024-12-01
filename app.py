@@ -224,9 +224,9 @@ class Bot(commands.Bot):
             return
         
         sellout_score = you[0] + other[0] - teammate[0] - opponent[0]
-        recommendation = f"You should sell out {teammate[1]}. JULES" if sellout_score > 0 else f"You shouldn't sell out {teammate[1]}. JULES"
+        recommendation = f"You should sell out {teammate[1].replace(".", "")}. JULES" if sellout_score > 0 else f"You shouldn't sell out {teammate[1].replace(".", "")}. JULES"
         
-        await ctx.reply(f"{you[1]} Sellout Score: {sellout_score}. {recommendation}")
+        await ctx.reply(f"{you[1].replace(".", "")} Sellout Score: {sellout_score}. {recommendation}")
     
     @commands.command()
     async def info(self, ctx: commands.Context):
