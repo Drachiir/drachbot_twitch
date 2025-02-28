@@ -114,11 +114,11 @@ class Bot(commands.Bot):
                 case "fine":
                     end_string = " 🍆"
                 case "pennywise":
-                    end_string = "🤡"
+                    end_string = " 🤡"
                 case _:
                     end_string = ""
             try:
-                await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo{end_string}")
+                await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo({stats["overallPeakEloThisSeason"]}){end_string}")
             except Exception:
                 await ctx.reply(f"No data available for {playername}")
         except Exception:
