@@ -154,7 +154,7 @@ class Bot(commands.Bot):
                 await ctx.reply(f"Bot error 😭")
                 return
         
-        await ctx.reply(f"{stats["profile"][0]["playerName"]} is Rank {rank}, {stats["overallElo"]} Elo")
+        await ctx.reply(f"{stats["profile"][0]["playerName"]} is Rank {rank}, {stats["overallElo"]} Elo({stats["overallPeakEloThisSeason"]})")
     
     @commands.command()
     async def lobby(self, ctx: commands.Context):
