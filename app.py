@@ -118,7 +118,7 @@ class Bot(commands.Bot):
                 case _:
                     end_string = ""
             try:
-                await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo({stats["overallPeakEloThisSeason"]}){end_string}")
+                await ctx.reply(f"{playername} {start_string} {stats["overallElo"]} Elo ({stats["overallPeakEloThisSeason"]} Peak){end_string}")
             except Exception:
                 await ctx.reply(f"No data available for {playername}")
         except Exception:
@@ -154,7 +154,7 @@ class Bot(commands.Bot):
                 await ctx.reply(f"Bot error 😭")
                 return
         
-        await ctx.reply(f"{stats["profile"][0]["playerName"]} is Rank {rank}, {stats["overallElo"]} Elo({stats["overallPeakEloThisSeason"]})")
+        await ctx.reply(f"{stats["profile"][0]["playerName"]} is Rank {rank}, {stats["overallElo"]} Elo ({stats["overallPeakEloThisSeason"]} Peak)")
     
     @commands.command()
     async def lobby(self, ctx: commands.Context):
