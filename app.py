@@ -252,7 +252,7 @@ class Bot(commands.Bot):
         except Exception:
             await ctx.reply("Need a number 1-21")
             return
-        await ctx.reply(f"Wave {wave} recc. value is {recc_values[wave-1]}")
+        await ctx.reply(f"Wave {wave} base recommended value is {recc_values[wave-1]}")
 
 if __name__ == "__main__":
     bot = Bot()
