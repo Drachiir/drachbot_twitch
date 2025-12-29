@@ -34,6 +34,18 @@ def check_command_enabled(command_list, command):
         return True
     else:
         return False
+
+def calculate_win_probability(team_a_elo, team_b_elo):
+    return 1 / (1 + 10 ** ((team_b_elo - team_a_elo) / 400))
+
+def calculate_elo_change(team_elo, opponent_elo):
+    K = 32
+    win_prob = calculate_win_probability(team_elo, opponent_elo)
+    elo_change = K * (1 - win_prob)  # result = 1 for win
+    elo_change = min(30, max(-30, elo_change))
+    if elo_change < 2:
+        elo_change = 2
+    return round(elo_change)
     
 with open("Files/json/Secrets.json", "r") as f:
     secret = json.load(f)
@@ -171,7 +183,7 @@ class Bot(commands.Bot):
         url = f'https://stats.drachbot.site/api/livegames/{name}'
         async with self.session.get(url) as response:
             if response.status != 200:
-                print(response.status)
+                print(response.status, response.text)
                 await ctx.reply(f"Bot error 😭")
                 return
             try:
@@ -182,7 +194,19 @@ class Bot(commands.Bot):
         if not game:
             await ctx.reply(f"{name} is not in game currently.")
             return
-        await ctx.reply((", ".join([f"{player[0]}: {player[1]}" for player in game[2]]) + " vs. " + (", ".join([f"{player[0]}: {player[1]}" for player in game[3]]))))
+        
+        # Calculate average elo for each team
+        west_players = game[2]
+        east_players = game[3]
+        team1_avg_elo = sum(float(p[1]) for p in west_players) / len(west_players)
+        team2_avg_elo = sum(float(p[1]) for p in east_players) / len(east_players)
+        
+        # Calculate elo changes
+        team1_elo_change = calculate_elo_change(team1_avg_elo, team2_avg_elo)
+        team2_elo_change = calculate_elo_change(team2_avg_elo, team1_avg_elo)
+        
+        players_str = ", ".join([f"{player[0]}: {player[1]}" for player in west_players]) + " vs. " + ", ".join([f"{player[0]}: {player[1]}" for player in east_players])
+        await ctx.reply(f"{players_str} (±{team1_elo_change} / ±{team2_elo_change})")
     
     @commands.command()
     async def sellout(self, ctx: commands.Context):
